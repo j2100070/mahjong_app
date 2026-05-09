@@ -139,6 +139,9 @@
   transition: all var(--transition-fast);
   border-radius: 4px;
   flex-shrink: 0;
+  border: 1.5px solid var(--border);
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
 }
 
 .tile-img-wrapper:hover {
@@ -410,6 +413,17 @@
 .btn-cancel {
   border: 1px solid var(--border);
   color: var(--text-secondary);
+}
+
+.meld-error {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--error);
+  background: var(--error-bg);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: var(--radius-sm);
 }
 
 /* ---------- Game Context ---------- */

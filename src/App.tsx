@@ -1,18 +1,16 @@
 import { useState, useCallback } from 'react'
 import { calculate, validateContext } from './engine/index'
-import { stringToTile } from './engine/tiles'
+import { stringToTile, normalize } from './engine/tiles'
 import type { HandInput, GameContext, Meld, ScoreResult } from './engine/types'
 import { TileImage } from './components/TileImage'
 import './App.css'
 
-// ---- Constants ----
 const SUITS = [
-  { key: 'm', label: '萬子', tiles: ['1m','2m','3m','4m','5m','6m','7m','8m','9m'] },
-  { key: 'p', label: '筒子', tiles: ['1p','2p','3p','4p','5p','6p','7p','8p','9p'] },
-  { key: 's', label: '索子', tiles: ['1s','2s','3s','4s','5s','6s','7s','8s','9s'] },
+  { key: 'm', label: '萬子', tiles: ['1m','2m','3m','4m','5m','0m','6m','7m','8m','9m'] },
+  { key: 'p', label: '筒子', tiles: ['1p','2p','3p','4p','5p','0p','6p','7p','8p','9p'] },
+  { key: 's', label: '索子', tiles: ['1s','2s','3s','4s','5s','0s','6s','7s','8s','9s'] },
   { key: 'z', label: '字牌', tiles: ['東','南','西','北','白','發','中'] },
 ]
-const RED_MAP: Record<string, string> = { '5m': '0m', '5p': '0p', '5s': '0s' }
 const WIND_TILES = [
   { code: 41, label: '東' }, { code: 42, label: '南' },
   { code: 43, label: '西' }, { code: 44, label: '北' },
@@ -62,12 +60,41 @@ function getMainScore(result: ScoreResult, ctx: GameContext): number {
   return result.ronScore ?? 0
 }
 
+// ---- Meld validation ----
+function validateMeldTiles(type: string, tiles: string[]): string | null {
+  const codes = tiles.map(stringToTile)
+  const normalized = codes.map(normalize)
+
+  if (type === 'chi') {
+    // Chi: 3 consecutive tiles of the same suit
+    if (tiles.length !== 3) return 'チーは3枚必要です'
+    const suits = codes.map(c => Math.floor(normalize(c) / 10))
+    if (suits[0] >= 4 || suits.some(s => s !== suits[0])) return 'チーは同じ種類の数牌のみ可能です'
+    const nums = normalized.map(c => c % 10).sort((a, b) => a - b)
+    if (nums[1] !== nums[0] + 1 || nums[2] !== nums[1] + 1) return 'チーは連続する3枚の数牌が必要です'
+    return null
+  }
+
+  if (type === 'pon') {
+    if (tiles.length !== 3) return 'ポンは3枚必要です'
+    if (!normalized.every(n => n === normalized[0])) return 'ポンは同じ牌3枚が必要です'
+    return null
+  }
+
+  if (type === 'kantsu' || type === 'kantsu-closed') {
+    if (tiles.length !== 4) return 'カンは4枚必要です'
+    if (!normalized.every(n => n === normalized[0])) return 'カンは同じ牌4枚が必要です'
+    return null
+  }
+
+  return null
+}
+
 // ---- Main App ----
 function App() {
   const [activeSuit, setActiveSuit] = useState('m')
   const [selectedTiles, setSelectedTiles] = useState<string[]>([])
   const [agariIndex, setAgariIndex] = useState<number | null>(null)
-  const [useRed, setUseRed] = useState(false)
   const [calledMelds, setCalledMelds] = useState<Meld[]>([])
   const [ctx, setCtx] = useState<GameContext>(defaultContext())
   const [doraStrs, setDoraStrs] = useState<string[]>([])
@@ -75,6 +102,7 @@ function App() {
   const [result, setResult] = useState<ScoreResult | null>(null)
   const [showDoraPicker, setShowDoraPicker] = useState<'dora'|'ura'|null>(null)
   const [meldBuilder, setMeldBuilder] = useState<{type: string, tiles: string[]}|null>(null)
+  const [meldError, setMeldError] = useState<string | null>(null)
 
   // maxHandTiles not used directly; adjustedMax is the working variable
   // For kantsu, hand tiles count is reduced by 3 (not 4) since kantsu adds 1 extra
@@ -90,10 +118,9 @@ function App() {
   }, [selectedTiles, calledMelds, doraStrs, uraDoraStrs])
 
   const addTile = (tileStr: string) => {
-    const actual = useRed && RED_MAP[tileStr] ? RED_MAP[tileStr] : tileStr
     if (selectedTiles.length >= adjustedMax) return
-    if (countTile(actual) >= 4) return
-    setSelectedTiles(prev => [...prev, actual])
+    if (countTile(tileStr) >= 4) return
+    setSelectedTiles(prev => [...prev, tileStr])
     setResult(null)
   }
 
@@ -130,19 +157,34 @@ function App() {
   }
 
   // Meld builder
-  const startMeld = (type: string) => setMeldBuilder({ type, tiles: [] })
+  const startMeld = (type: string) => {
+    setMeldBuilder({ type, tiles: [] })
+    setMeldError(null)
+  }
 
   const addMeldTile = (tileStr: string) => {
     if (!meldBuilder) return
-    const needed = meldBuilder.type === 'kantsu' ? 4 : 3
+    const needed = meldBuilder.type.startsWith('kantsu') ? 4 : 3
     if (meldBuilder.tiles.length >= needed) return
     setMeldBuilder(prev => prev ? { ...prev, tiles: [...prev.tiles, tileStr] } : null)
+    setMeldError(null)
   }
 
   const confirmMeld = () => {
     if (!meldBuilder) return
-    const needed = meldBuilder.type === 'kantsu' ? 4 : 3
-    if (meldBuilder.tiles.length !== needed) return
+    const needed = meldBuilder.type.startsWith('kantsu') ? 4 : 3
+    if (meldBuilder.tiles.length !== needed) {
+      setMeldError(`${needed}枚の牌を選択してください`)
+      return
+    }
+
+    // Validate meld composition
+    const error = validateMeldTiles(meldBuilder.type, meldBuilder.tiles)
+    if (error) {
+      setMeldError(error)
+      return
+    }
+
     const codes = meldBuilder.tiles.map(stringToTile)
     const isAnkan = meldBuilder.type === 'kantsu-closed'
     const meldType = meldBuilder.type.startsWith('kantsu') ? 'kantsu' as const
@@ -156,6 +198,7 @@ function App() {
     }
     setCalledMelds(prev => [...prev, meld])
     setMeldBuilder(null)
+    setMeldError(null)
     setResult(null)
   }
 
@@ -219,20 +262,14 @@ function App() {
               data-suit={s.key} onClick={() => setActiveSuit(s.key)}>{s.label}</button>
           ))}
         </div>
-        {activeSuit !== 'z' && (
-          <div className="red-dora-toggle">
-            <label><input type="checkbox" checked={useRed} onChange={e => setUseRed(e.target.checked)} /> 赤ドラ(赤5)</label>
-          </div>
-        )}
         <div className="tile-grid">
           {SUITS.find(s => s.key === activeSuit)!.tiles.map(t => {
             const remaining = 4 - countTile(t)
             const disabled = remaining <= 0 || selectedTiles.length >= adjustedMax
-            const displayTile = useRed && RED_MAP[t] ? RED_MAP[t] : t
             return (
               <button key={t} className={`tile-btn ${disabled ? 'disabled' : ''}`}
                 data-suit={getSuitKey(t)} onClick={() => addTile(t)}>
-                <TileImage tileStr={displayTile} size="md" disabled={disabled} remaining={remaining} />
+                <TileImage tileStr={t} size="md" disabled={disabled} remaining={remaining} />
               </button>
             )
           })}
@@ -303,9 +340,12 @@ function App() {
                 <TileImage key={i} tileStr={t} size="xs" />
               ))}
             </div>
+            {meldError && (
+              <div className="meld-error">{meldError}</div>
+            )}
             <div className="meld-builder-actions">
               <button className="btn-confirm" onClick={confirmMeld}>確定</button>
-              <button className="btn-cancel" onClick={() => setMeldBuilder(null)}>キャンセル</button>
+              <button className="btn-cancel" onClick={() => { setMeldBuilder(null); setMeldError(null) }}>キャンセル</button>
             </div>
           </div>
         )}
