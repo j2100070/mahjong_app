@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react'
 import { calculate, validateContext } from './engine/index'
-import { stringToTile, tileToString } from './engine/tiles'
+import { stringToTile } from './engine/tiles'
 import type { HandInput, GameContext, Meld, ScoreResult } from './engine/types'
+import { TileImage } from './components/TileImage'
 import './App.css'
 
 // ---- Constants ----
@@ -227,11 +228,11 @@ function App() {
           {SUITS.find(s => s.key === activeSuit)!.tiles.map(t => {
             const remaining = 4 - countTile(t)
             const disabled = remaining <= 0 || selectedTiles.length >= adjustedMax
+            const displayTile = useRed && RED_MAP[t] ? RED_MAP[t] : t
             return (
-              <button key={t} className={`tile-btn ${disabled ? 'disabled' : ''} ${useRed && RED_MAP[t] ? 'red-dora' : ''}`}
+              <button key={t} className={`tile-btn ${disabled ? 'disabled' : ''}`}
                 data-suit={getSuitKey(t)} onClick={() => addTile(t)}>
-                {t.replace(/[mps]$/, '')}
-                {remaining < 4 && <span className="tile-count">{remaining}</span>}
+                <TileImage tileStr={displayTile} size="md" disabled={disabled} remaining={remaining} />
               </button>
             )
           })}
@@ -246,10 +247,14 @@ function App() {
           <div className="selected-tiles-row">
             {selectedTiles.length === 0 && <div className="empty-hint" style={{width:'100%'}}>牌をタップして追加</div>}
             {selectedTiles.map((t, i) => (
-              <div key={i} className={`tile-chip ${agariIndex === i ? 'is-agari' : ''} ${t.startsWith('0') ? 'red' : ''}`}
-                data-suit={getSuitKey(t)} onClick={() => toggleAgari(i)} onContextMenu={e => { e.preventDefault(); removeTile(i) }}>
-                {tileToString(stringToTile(t)).replace(/[mps]$/, s => ({m:'',p:'',s:''}[s] ?? s))}
-              </div>
+              <TileImage
+                key={i}
+                tileStr={t}
+                size="sm"
+                isAgari={agariIndex === i}
+                onClick={() => toggleAgari(i)}
+                onContextMenu={e => { e.preventDefault(); removeTile(i) }}
+              />
             ))}
           </div>
           {selectedTiles.length > 0 && agariIndex === null && (
@@ -289,13 +294,13 @@ function App() {
             <div className="tile-grid">
               {SUITS.find(s => s.key === activeSuit)!.tiles.map(t => (
                 <button key={t} className="tile-btn" data-suit={getSuitKey(t)} onClick={() => addMeldTile(t)}>
-                  {t.replace(/[mps]$/, '')}
+                  <TileImage tileStr={t} size="md" />
                 </button>
               ))}
             </div>
             <div className="meld-tiles" style={{marginTop:8}}>
               {meldBuilder.tiles.map((t, i) => (
-                <div key={i} className="tile-chip" data-suit={getSuitKey(t)}>{t.replace(/[mps]$/, '')}</div>
+                <TileImage key={i} tileStr={t} size="xs" />
               ))}
             </div>
             <div className="meld-builder-actions">
@@ -313,9 +318,7 @@ function App() {
               </span>
               <div className="meld-tiles">
                 {m.tiles.map((t, j) => (
-                  <div key={j} className="tile-chip" data-suit={getSuitKey(tileToString(t))} style={{width:28,height:28,fontSize:11}}>
-                    {tileToString(t).replace(/[mps]$/, '')}
-                  </div>
+                  <TileImage key={j} tileCode={t} size="xs" />
                 ))}
               </div>
               <button className="meld-remove-btn" onClick={() => removeMeld(i)}>✕</button>
@@ -390,10 +393,7 @@ function App() {
             <div className="context-label">ドラ表示牌</div>
             <div className="dora-tiles">
               {doraStrs.map((d, i) => (
-                <div key={i} className="tile-chip" data-suit={getSuitKey(d)} style={{width:30,height:30,fontSize:11}}
-                  onClick={() => removeDora(i, 'dora')}>
-                  {d.replace(/[mps]$/, '')}
-                </div>
+                <TileImage key={i} tileStr={d} size="xs" onClick={() => removeDora(i, 'dora')} />
               ))}
               {doraStrs.length < 5 && <button className="dora-add-btn" onClick={() => setShowDoraPicker('dora')}>+</button>}
             </div>
@@ -404,10 +404,7 @@ function App() {
               <div className="context-label">裏ドラ表示牌</div>
               <div className="dora-tiles">
                 {uraDoraStrs.map((d, i) => (
-                  <div key={i} className="tile-chip" data-suit={getSuitKey(d)} style={{width:30,height:30,fontSize:11}}
-                    onClick={() => removeDora(i, 'ura')}>
-                    {d.replace(/[mps]$/, '')}
-                  </div>
+                  <TileImage key={i} tileStr={d} size="xs" onClick={() => removeDora(i, 'ura')} />
                 ))}
                 {uraDoraStrs.length < 5 && <button className="dora-add-btn" onClick={() => setShowDoraPicker('ura')}>+</button>}
               </div>
@@ -497,7 +494,7 @@ function App() {
             <div className="tile-grid">
               {SUITS.find(s => s.key === activeSuit)!.tiles.map(t => (
                 <button key={t} className="tile-btn" data-suit={getSuitKey(t)} onClick={() => addDoraTile(t)}>
-                  {t.replace(/[mps]$/, '')}
+                  <TileImage tileStr={t} size="md" />
                 </button>
               ))}
             </div>

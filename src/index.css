@@ -4,50 +4,50 @@
 
 /* ---------- Design Tokens ---------- */
 :root {
-  /* Backgrounds */
-  --bg-dark: #0a0e14;
-  --bg-card: #141a23;
-  --bg-card-hover: #1a2230;
-  --bg-input: #0d1219;
-  --bg-surface: #111820;
+  /* Backgrounds — Light theme */
+  --bg-dark: #ffffff;
+  --bg-card: #f8f9fb;
+  --bg-card-hover: #f0f2f5;
+  --bg-input: #ffffff;
+  --bg-surface: #f3f4f6;
 
   /* Accent — Jade Green */
-  --accent: #2dd4a8;
-  --accent-dim: #1a9e7a;
-  --accent-glow: rgba(45, 212, 168, 0.12);
-  --accent-glow-strong: rgba(45, 212, 168, 0.25);
+  --accent: #0d9373;
+  --accent-dim: #0b7a60;
+  --accent-glow: rgba(13, 147, 115, 0.08);
+  --accent-glow-strong: rgba(13, 147, 115, 0.2);
 
-  /* Text */
-  --text-primary: #e8ecf1;
-  --text-secondary: #8b95a5;
-  --text-muted: #5a6474;
-  --text-accent: #2dd4a8;
+  /* Text — Dark on light */
+  --text-primary: #1a1d23;
+  --text-secondary: #5a6270;
+  --text-muted: #9ca3af;
+  --text-accent: #0d9373;
 
-  /* Tile suit colors */
-  --tile-man: #60a5fa;
-  --tile-pin: #fb923c;
-  --tile-sou: #4ade80;
-  --tile-ji: #c084fc;
-  --tile-red: #f43f5e;
+  /* Tile suit colors (slightly deeper for light bg) */
+  --tile-man: #2563eb;
+  --tile-pin: #ea580c;
+  --tile-sou: #16a34a;
+  --tile-ji: #9333ea;
+  --tile-red: #e11d48;
 
-  /* Borders */
-  --border: #1e2836;
-  --border-light: #2a3545;
-  --border-accent: rgba(45, 212, 168, 0.3);
+  /* Borders — Light */
+  --border: #e2e5ea;
+  --border-light: #d1d5db;
+  --border-accent: rgba(13, 147, 115, 0.3);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 20px rgba(45, 212, 168, 0.15);
+  /* Shadows — Subtle for light theme */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 16px rgba(13, 147, 115, 0.12);
 
   /* Yakuman gold */
-  --gold: #fbbf24;
-  --gold-glow: rgba(251, 191, 36, 0.2);
+  --gold: #d97706;
+  --gold-glow: rgba(217, 119, 6, 0.1);
 
   /* Error */
-  --error: #f87171;
-  --error-bg: rgba(248, 113, 113, 0.1);
+  --error: #dc2626;
+  --error-bg: rgba(220, 38, 38, 0.06);
 
   /* Radius */
   --radius-sm: 6px;

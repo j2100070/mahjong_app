@@ -1,4 +1,23 @@
-# React + TypeScript + Vite
+# 🀄 麻雀点数計算
+
+日本式リーチ麻雀の点数計算アプリ。手牌・副露・場の情報を入力すると、役・符・点数を自動計算します。
+
+## 技術スタック
+
+- React + TypeScript + Vite
+- Docker / Nginx（本番デプロイ用）
+
+## クレジット
+
+### 牌画像
+
+牌の画像素材は以下のオープンソースプロジェクトを使用しています：
+
+- **[FluffyStuff/riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles)**
+  - ライセンス: [CC0 1.0 (パブリックドメイン)](https://creativecommons.org/publicdomain/zero/1.0/)
+  - 作者: Kristján (FluffyStuff)
+
+## セットアップ
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
