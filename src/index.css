@@ -1,0 +1,132 @@
+/* ============================================================
+   Mahjong Score Calculator — Design System
+   ============================================================ */
+
+/* ---------- Design Tokens ---------- */
+:root {
+  /* Backgrounds */
+  --bg-dark: #0a0e14;
+  --bg-card: #141a23;
+  --bg-card-hover: #1a2230;
+  --bg-input: #0d1219;
+  --bg-surface: #111820;
+
+  /* Accent — Jade Green */
+  --accent: #2dd4a8;
+  --accent-dim: #1a9e7a;
+  --accent-glow: rgba(45, 212, 168, 0.12);
+  --accent-glow-strong: rgba(45, 212, 168, 0.25);
+
+  /* Text */
+  --text-primary: #e8ecf1;
+  --text-secondary: #8b95a5;
+  --text-muted: #5a6474;
+  --text-accent: #2dd4a8;
+
+  /* Tile suit colors */
+  --tile-man: #60a5fa;
+  --tile-pin: #fb923c;
+  --tile-sou: #4ade80;
+  --tile-ji: #c084fc;
+  --tile-red: #f43f5e;
+
+  /* Borders */
+  --border: #1e2836;
+  --border-light: #2a3545;
+  --border-accent: rgba(45, 212, 168, 0.3);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(45, 212, 168, 0.15);
+
+  /* Yakuman gold */
+  --gold: #fbbf24;
+  --gold-glow: rgba(251, 191, 36, 0.2);
+
+  /* Error */
+  --error: #f87171;
+  --error-bg: rgba(248, 113, 113, 0.1);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+
+  /* Font */
+  --font-sans: 'Inter', 'Noto Sans JP', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ---------- Global Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+input, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+}
+
+/* ---------- Utilities ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
