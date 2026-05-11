@@ -6,10 +6,10 @@ import { TileImage } from './components/TileImage'
 import './App.css'
 
 const SUITS = [
-  { key: 'm', label: '萬子', tiles: ['1m','2m','3m','4m','5m','0m','6m','7m','8m','9m'] },
-  { key: 'p', label: '筒子', tiles: ['1p','2p','3p','4p','5p','0p','6p','7p','8p','9p'] },
-  { key: 's', label: '索子', tiles: ['1s','2s','3s','4s','5s','0s','6s','7s','8s','9s'] },
-  { key: 'z', label: '字牌', tiles: ['東','南','西','北','白','發','中'] },
+  { key: 'm', label: '萬子', tiles: ['1m', '2m', '3m', '4m', '5m', '0m', '6m', '7m', '8m', '9m'] },
+  { key: 'p', label: '筒子', tiles: ['1p', '2p', '3p', '4p', '5p', '0p', '6p', '7p', '8p', '9p'] },
+  { key: 's', label: '索子', tiles: ['1s', '2s', '3s', '4s', '5s', '0s', '6s', '7s', '8s', '9s'] },
+  { key: 'z', label: '字牌', tiles: ['東', '南', '西', '北', '白', '發', '中'] },
 ]
 const WIND_TILES = [
   { code: 41, label: '東' }, { code: 42, label: '南' },
@@ -100,8 +100,8 @@ function App() {
   const [doraStrs, setDoraStrs] = useState<string[]>([])
   const [uraDoraStrs, setUraDoraStrs] = useState<string[]>([])
   const [result, setResult] = useState<ScoreResult | null>(null)
-  const [showDoraPicker, setShowDoraPicker] = useState<'dora'|'ura'|null>(null)
-  const [meldBuilder, setMeldBuilder] = useState<{type: string, tiles: string[]}|null>(null)
+  const [showDoraPicker, setShowDoraPicker] = useState<'dora' | 'ura' | null>(null)
+  const [meldBuilder, setMeldBuilder] = useState<{ type: string, tiles: string[] } | null>(null)
   const [meldError, setMeldError] = useState<string | null>(null)
 
   // maxHandTiles not used directly; adjustedMax is the working variable
@@ -140,20 +140,15 @@ function App() {
     setResult(null)
   }
 
-  const toggleSituationYaku = (key: keyof GameContext) => {
-    setCtx(prev => ({ ...prev, [key]: !prev[key] }))
-    setResult(null)
-  }
-
   const addDoraTile = (tileStr: string) => {
     if (showDoraPicker === 'dora') setDoraStrs(prev => [...prev, tileStr])
     else setUraDoraStrs(prev => [...prev, tileStr])
     setShowDoraPicker(null)
   }
 
-  const removeDora = (index: number, type: 'dora'|'ura') => {
-    if (type === 'dora') setDoraStrs(prev => prev.filter((_,i) => i !== index))
-    else setUraDoraStrs(prev => prev.filter((_,i) => i !== index))
+  const removeDora = (index: number, type: 'dora' | 'ura') => {
+    if (type === 'dora') setDoraStrs(prev => prev.filter((_, i) => i !== index))
+    else setUraDoraStrs(prev => prev.filter((_, i) => i !== index))
   }
 
   // Meld builder
@@ -203,7 +198,7 @@ function App() {
   }
 
   const removeMeld = (index: number) => {
-    setCalledMelds(prev => prev.filter((_,i) => i !== index))
+    setCalledMelds(prev => prev.filter((_, i) => i !== index))
     setResult(null)
   }
 
@@ -227,11 +222,12 @@ function App() {
   }
 
   const doNagashi = () => {
-    const gameCtx: GameContext = { ...ctx, isNagashiMangan: true }
+    const gameCtx: GameContext = { ...ctx, isTsumo: true, isNagashiMangan: true }
     const dummyInput: HandInput = {
-      tiles: [11,12,13,14,15,16,17,18,19,11,12,13,21,21].map(Number),
+      tiles: [11, 12, 13, 14, 15, 16, 17, 18, 19, 11, 12, 13, 21, 21].map(Number),
       agariTile: 21, calledMelds: [],
     }
+    setCtx({ ...ctx, isNagashiMangan: true, isTsumo: true })
     setResult(calculate(dummyInput, gameCtx))
   }
 
@@ -282,7 +278,7 @@ function App() {
             <span>{selectedTiles.length} / {adjustedMax}枚</span>
           </div>
           <div className="selected-tiles-row">
-            {selectedTiles.length === 0 && <div className="empty-hint" style={{width:'100%'}}>牌をタップして追加</div>}
+            {selectedTiles.length === 0 && <div className="empty-hint" style={{ width: '100%' }}>牌をタップして追加</div>}
             {selectedTiles.map((t, i) => (
               <TileImage
                 key={i}
@@ -298,7 +294,7 @@ function App() {
             <div className="agari-hint">牌をタップしてアガリ牌を指定 / 長押しで削除</div>
           )}
           {selectedTiles.length > 0 && (
-            <button style={{marginTop:8,fontSize:12,color:'var(--text-muted)',textDecoration:'underline'}} onClick={() => { setSelectedTiles([]); setAgariIndex(null) }}>手牌をクリア</button>
+            <button style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)', textDecoration: 'underline' }} onClick={() => { setSelectedTiles([]); setAgariIndex(null) }}>手牌をクリア</button>
           )}
         </div>
       </section>
@@ -322,7 +318,7 @@ function App() {
               {meldBuilder.type === 'chi' ? 'チー' : meldBuilder.type === 'pon' ? 'ポン' : meldBuilder.type === 'kantsu' ? '明カン' : '暗カン'}
               の牌を選択 ({meldBuilder.tiles.length}/{meldBuilder.type.startsWith('kantsu') ? 4 : 3})
             </div>
-            <div className="suit-tabs" style={{marginBottom:8}}>
+            <div className="suit-tabs" style={{ marginBottom: 8 }}>
               {SUITS.map(s => (
                 <button key={s.key} className={`suit-tab ${activeSuit === s.key ? 'active' : ''}`}
                   data-suit={s.key} onClick={() => setActiveSuit(s.key)}>{s.label}</button>
@@ -335,7 +331,7 @@ function App() {
                 </button>
               ))}
             </div>
-            <div className="meld-tiles" style={{marginTop:8}}>
+            <div className="meld-tiles" style={{ marginTop: 8 }}>
               {meldBuilder.tiles.map((t, i) => (
                 <TileImage key={i} tileStr={t} size="xs" />
               ))}
@@ -394,7 +390,7 @@ function App() {
           <div className="context-row">
             <div className="context-label">場風</div>
             <div className="toggle-group">
-              {[{c:41,l:'東'},{c:42,l:'南'}].map(w => (
+              {[{ c: 41, l: '東' }, { c: 42, l: '南' }].map(w => (
                 <button key={w.c} className={`toggle-btn ${ctx.roundWind === w.c ? 'active' : ''}`}
                   onClick={() => updateCtx({ roundWind: w.c })}>{w.l}</button>
               ))}
@@ -411,21 +407,65 @@ function App() {
           </div>
           {/* Situation Yaku */}
           <div className="context-row">
-            <div className="context-label">状況役</div>
-            <div className="checkbox-grid">
-              {([
-                ['isRiichi','リーチ'],['isDoubleRiichi','ダブリー'],
-                ['isIppatsu','一発'],['isRinshan','嶺上開花'],
-                ['isChankan','槍槓'],['isHaitei','海底摸月'],
-                ['isHoutei','河底撈魚'],['isTenhou','天和'],
-                ['isChiihou','地和'],
-              ] as [keyof GameContext, string][]).map(([key, label]) => (
-                <label key={key} className={`checkbox-item ${ctx[key] ? 'checked' : ''}`}>
-                  <input type="checkbox" checked={!!ctx[key]} onChange={() => toggleSituationYaku(key)} />
-                  <span className="check-icon">{ctx[key] ? '✓' : ''}</span>
-                  {label}
-                </label>
-              ))}
+            <div className="context-label">リーチ状態</div>
+            <div className="toggle-group">
+              <button className={`toggle-btn ${!ctx.isRiichi && !ctx.isDoubleRiichi ? 'active' : ''}`}
+                onClick={() => updateCtx({ isRiichi: false, isDoubleRiichi: false, isIppatsu: false })}>なし</button>
+              <button className={`toggle-btn ${ctx.isRiichi && !ctx.isDoubleRiichi ? 'active' : ''}`}
+                onClick={() => updateCtx({ isRiichi: true, isDoubleRiichi: false })}>リーチ</button>
+              <button className={`toggle-btn ${ctx.isDoubleRiichi ? 'active' : ''}`}
+                onClick={() => updateCtx({ isRiichi: true, isDoubleRiichi: true })}>ダブリー</button>
+            </div>
+          </div>
+          {(ctx.isRiichi || ctx.isDoubleRiichi) && (
+            <div className="context-row">
+              <div className="context-label">一発</div>
+              <div className="toggle-group">
+                <button className={`toggle-btn ${!ctx.isIppatsu ? 'active' : ''}`}
+                  onClick={() => updateCtx({ isIppatsu: false })}>なし</button>
+                <button className={`toggle-btn ${ctx.isIppatsu ? 'active' : ''}`}
+                  onClick={() => updateCtx({ isIppatsu: true })}>一発</button>
+              </div>
+            </div>
+          )}
+          <div className="context-row">
+            <div className="context-label">嶺上開花</div>
+            <div className="toggle-group">
+              <button className={`toggle-btn ${!ctx.isRinshan ? 'active' : ''}`}
+                onClick={() => updateCtx({ isRinshan: false })}>なし</button>
+              <button className={`toggle-btn ${ctx.isRinshan ? 'active' : ''}`}
+                onClick={() => updateCtx({ isRinshan: true })}>嶺上開花</button>
+            </div>
+          </div>
+          <div className="context-row">
+            <div className="context-label">槍槓</div>
+            <div className="toggle-group">
+              <button className={`toggle-btn ${!ctx.isChankan ? 'active' : ''}`}
+                onClick={() => updateCtx({ isChankan: false })}>なし</button>
+              <button className={`toggle-btn ${ctx.isChankan ? 'active' : ''}`}
+                onClick={() => updateCtx({ isChankan: true })}>槍槓</button>
+            </div>
+          </div>
+          <div className="context-row">
+            <div className="context-label">海底・河底</div>
+            <div className="toggle-group">
+              <button className={`toggle-btn ${!ctx.isHaitei && !ctx.isHoutei ? 'active' : ''}`}
+                onClick={() => updateCtx({ isHaitei: false, isHoutei: false })}>なし</button>
+              <button className={`toggle-btn ${ctx.isHaitei ? 'active' : ''}`}
+                onClick={() => updateCtx({ isHaitei: true, isHoutei: false })}>海底摸月</button>
+              <button className={`toggle-btn ${ctx.isHoutei ? 'active' : ''}`}
+                onClick={() => updateCtx({ isHaitei: false, isHoutei: true })}>河底撈魚</button>
+            </div>
+          </div>
+          <div className="context-row">
+            <div className="context-label">天和・地和</div>
+            <div className="toggle-group">
+              <button className={`toggle-btn ${!ctx.isTenhou && !ctx.isChiihou ? 'active' : ''}`}
+                onClick={() => updateCtx({ isTenhou: false, isChiihou: false })}>なし</button>
+              <button className={`toggle-btn ${ctx.isTenhou ? 'active' : ''}`}
+                onClick={() => updateCtx({ isTenhou: true, isChiihou: false })}>天和</button>
+              <button className={`toggle-btn ${ctx.isChiihou ? 'active' : ''}`}
+                onClick={() => updateCtx({ isTenhou: false, isChiihou: true })}>地和</button>
             </div>
           </div>
           {/* Dora */}
@@ -511,7 +551,7 @@ function App() {
               )}
             </div>
           )}
-          <button style={{marginTop:16,width:'100%',padding:12,borderRadius:'var(--radius-sm)',border:'1px solid var(--border)',color:'var(--text-secondary)',fontSize:14,fontWeight:600}} onClick={reset}>
+          <button style={{ marginTop: 16, width: '100%', padding: 12, borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600 }} onClick={reset}>
             リセット
           </button>
         </section>
@@ -525,7 +565,7 @@ function App() {
               <div className="tile-picker-title">{showDoraPicker === 'dora' ? 'ドラ表示牌' : '裏ドラ表示牌'}を選択</div>
               <button className="tile-picker-close" onClick={() => setShowDoraPicker(null)}>✕</button>
             </div>
-            <div className="suit-tabs" style={{marginBottom:10}}>
+            <div className="suit-tabs" style={{ marginBottom: 10 }}>
               {SUITS.map(s => (
                 <button key={s.key} className={`suit-tab ${activeSuit === s.key ? 'active' : ''}`}
                   data-suit={s.key} onClick={() => setActiveSuit(s.key)}>{s.label}</button>
